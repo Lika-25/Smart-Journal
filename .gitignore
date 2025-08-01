@@ -1,15 +1,44 @@
-echo __pycache__/ > .gitignore
-echo *.pyc >> .gitignore
-echo *.pyo >> .gitignore
-echo *.pyd >> .gitignore
-echo *.sqlite3 >> .gitignore
-echo db.sqlite3 >> .gitignore
-echo .env >> .gitignore
-echo *.log >> .gitignore
-echo *.pot >> .gitignore
-echo *.py[cod] >> .gitignore
-echo *.DS_Store >> .gitignore
-echo .vscode/ >> .gitignore
-echo *.idea/ >> .gitignore
-echo staticfiles/ >> .gitignore
-echo media/ >> .gitignore
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env
+.venv/
+venv/
+
+# Logs
+*.log
+
+# Django static and media files
+staticfiles/
+media/
+
+# IDE/editor folders and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS system files
+.DS_Store
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# MyPy cache
+.mypy_cache/
+
+# Pytest cache
+.pytest_cache/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Celery beat schedule file
+celerybeat-schedule
+
+# Uncomment to ignore Django migrations (optional)
+# migrations/
