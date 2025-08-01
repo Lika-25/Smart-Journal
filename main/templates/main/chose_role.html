@@ -1,0 +1,17 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+    Вибір ролі
+{% endblock %}
+
+{% block content %}
+    <div class="text-center mt-5">
+        <h1 class="display-4">Реєстрація</h1>
+        <p class="lead mt-4">Вкажіть, ким ви є:</p>
+
+        <div class="mt-4">
+            <a href="{% url 'register_student' %}" class="btn btn-info btn-lg m-2">Я учень 👨‍🎓</a>
+            <a href="{% url 'register_teacher' %}" class="btn btn-warning btn-lg m-2">Я викладач 👩‍🏫</a>
+        </div>
+    </div>
+{% endblock %}

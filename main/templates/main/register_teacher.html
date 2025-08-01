@@ -1,0 +1,271 @@
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- jQuery (обов’язковий для Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+{% extends 'main/base.html' %}
+{% load custom_filters %}
+
+{% block title %}
+Реєстрація викладача
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Реєстрація викладача 👨‍🏫</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            {% for field in form %}
+            {% for error in field.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if step == 'email' %}
+        <!-- КРОК 1: Введення пошти -->
+        <div class="form-group mb-3">
+            <label for="id_email">Електронна пошта 📧</label>
+            {{ form.email }}
+        </div>
+        <button type="submit" class="btn btn-primary">Надіслати код</button>
+
+        {% elif step == 'verification' %}
+        <!-- КРОК 2: Підтвердження коду -->
+        <div class="form-group mb-3">
+            <label for="id_verification_code">Код підтвердження</label>
+            <input type="text" name="verification_code" id="id_verification_code" class="form-control" required
+                placeholder="Введіть код з пошти" autocomplete="off">
+        </div>
+        <input type="hidden" name="email" value="{{ email }}">
+        <button type="submit" class="btn btn-success">Підтвердити</button>
+
+        {% elif step == 'register' %}
+        <!-- КРОК 3: Повна реєстрація -->
+        <div class="form-group mb-3">
+            <label for="id_email">Електронна пошта 📧</label>
+            {{ form.email }}
+            <br>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="id_full_name">ПІБ (Прізвище, Ім'я, По-батькові) </label>
+            {{ form.full_name }}
+            <br>
+
+        </div>
+
+        <!-- Чекбокс: Класний керівник -->
+        <div class="form-group mb-3">
+            <label>
+                <input type="checkbox" id="id_is_class_teacher" name="is_class_teacher"
+                    onchange="toggleHomeroomClassSelect()" {% if form.is_class_teacher.value %}checked{% endif %}>
+                Я є класним керівником
+            </label>
+
+        </div>
+        <br>
+        <!-- Вибір класу для класного керівника -->
+        <div class="form-group mb-3" id="homeroom_class_block" style="display: none;">
+            <label for="id_class_teacher_of">Клас, у якого ви класний керівник</label>
+            <br>
+            {{ form.class_teacher_of }}
+            <br>
+        </div>
+
+        <!-- Предмети -->
+        <div class="form-group mb-3">
+            <label for="id_subjects">Предмети, які ви викладаєте</label>
+            {{ form.subjects }}
+        </div>
+        <br>
+        <!-- Класи, у яких викладаєте -->
+        <div class="form-group mb-3">
+            <label for="id_teaching_classes">Класи, у яких ви викладаєте</label>
+            {{ form.teaching_classes }}
+        </div>
+        <br>
+
+        <div class="form-group mb-3">
+
+            <label for="id_photo">Фото</label>
+            {{ form.photo }}
+            <br>
+            <img id="photo-preview" src="#" alt="Фото викладача" style="max-width: 100px; display: none;">
+        </div>
+
+
+        <!-- Поле пароль 1 -->
+        <div class="form-group mb-3 position-relative">
+            <label for="id_password1">Пароль</label>
+            <div class="input-group">
+                {{ form.password1|add_class:"form-control" }}
+                <span class="input-group-text" id="togglePassword1"
+                    style="cursor: pointer; position: relative; width: 40px; justify-content: center;">
+                    <!-- Іконка "закрите око" -->
+                    <svg id="eyeClosed1" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
+                        class="position-absolute" viewBox="0 0 16 16"
+                        style="transition: opacity 0.3s ease; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        <path
+                            d="M13.359 11.238C15.044 9.79 16 8 16 8s-1.4-2.655-4.24-4.272a13.13 13.13 0 0 0-2.066-.974L8.354 3.52a12.35 12.35 0 0 1 2.14.898C12.6 5.345 14 8 14 8s-.573 1.086-1.659 2.02l1.018 1.218z" />
+                        <path d="M13.646 14.354l-12-12 .708-.708 12 12-.708.708z" />
+                        <path
+                            d="M11.354 9.354l-1.95-1.95A3 3 0 0 0 8 5a3 3 0 0 0-2.707 1.666l-1.5-1.5A5.978 5.978 0 0 1 8 2c1.657 0 3.157.672 4.293 1.757C13.329 5.4 14 8 14 8s-.7 1.957-2.646 3.354z" />
+                        <path d="M5.354 7.354a3 3 0 0 0 3.292 3.292l-3.292-3.292z" />
+                    </svg>
+
+                    <!-- Іконка "відкрите око" -->
+                    <svg id="eyeOpen1" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
+                        class="position-absolute" viewBox="0 0 16 16"
+                        style="display: none; opacity: 0; transition: opacity 0.3s ease; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        <path
+                            d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.07-.122.15-.195.242-.346.426-.835.977-1.44 1.548C11.879 10.832 10.12 12 8 12s-3.879-1.168-5.168-2.457A13.133 13.133 0 0 1 1.172 8z" />
+                        <path d="M8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+                    </svg>
+                </span>
+            </div>
+        </div>
+
+
+        <!-- Поле пароль 2 -->
+        <div class="form-group mb-3 position-relative">
+            <label for="id_password2">Повторіть пароль</label>
+            <div class="input-group">
+                {{ form.password2|add_class:"form-control" }}
+                <span class="input-group-text" id="togglePassword2"
+                    style="cursor: pointer; position: relative; width: 40px; justify-content: center;">
+                    <!-- Іконка "закрите око" -->
+                    <svg id="eyeClosed2" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
+                        class="position-absolute" viewBox="0 0 16 16"
+                        style="top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 1;">
+                        <path
+                            d="M13.359 11.238C15.044 9.79 16 8 16 8s-1.4-2.655-4.24-4.272a13.13 13.13 0 0 0-2.066-.974L8.354 3.52a12.35 12.35 0 0 1 2.14.898C12.6 5.345 14 8 14 8s-.573 1.086-1.659 2.02l1.018 1.218z" />
+                        <path d="M13.646 14.354l-12-12 .708-.708 12 12-.708.708z" />
+                        <path
+                            d="M11.354 9.354l-1.95-1.95A3 3 0 0 0 8 5a3 3 0 0 0-2.707 1.666l-1.5-1.5A5.978 5.978 0 0 1 8 2c1.657 0 3.157.672 4.293 1.757C13.329 5.4 14 8 14 8s-.7 1.957-2.646 3.354z" />
+                        <path d="M5.354 7.354a3 3 0 0 0 3.292 3.292l-3.292-3.292z" />
+                    </svg>
+
+                    <!-- Іконка "відкрите око" -->
+                    <svg id="eyeOpen2" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
+                        class="position-absolute" viewBox="0 0 16 16"
+                        style="top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0; display: none;">
+                        <path
+                            d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.07-.122.15-.195.242-.346.426-.835.977-1.44 1.548C11.879 10.832 10.12 12 8 12s-3.879-1.168-5.168-2.457A13.133 13.133 0 0 1 1.172 8z" />
+                        <path d="M8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+                    </svg>
+                </span>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Зареєструватися</button>
+
+        {% else %}
+        <div class="alert alert-danger">
+            Невідомий крок. Спробуйте ще раз.
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+    const togglePassword1 = document.getElementById('togglePassword1');
+    const passwordInput1 = document.getElementById('id_password1');
+    const eyeClosed1 = document.getElementById('eyeClosed1');
+    const eyeOpen1 = document.getElementById('eyeOpen1');
+
+    togglePassword1.addEventListener('click', function () {
+        const type = passwordInput1.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput1.setAttribute('type', type);
+
+        if (type === 'text') {
+            eyeClosed1.style.opacity = '0';
+            eyeOpen1.style.display = 'inline';
+            setTimeout(() => {
+                eyeOpen1.style.opacity = '1';
+            }, 50);
+        } else {
+            eyeOpen1.style.opacity = '0';
+            setTimeout(() => {
+                eyeOpen1.style.display = 'none';
+                eyeClosed1.style.opacity = '1';
+            }, 300);
+        }
+    });
+
+    const togglePassword2 = document.getElementById('togglePassword2');
+    const passwordInput2 = document.getElementById('id_password2');
+    const eyeClosed2 = document.getElementById('eyeClosed2');
+    const eyeOpen2 = document.getElementById('eyeOpen2');
+
+    togglePassword2.addEventListener('click', function () {
+        const type = passwordInput2.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput2.setAttribute('type', type);
+
+        if (type === 'text') {
+            eyeClosed2.style.opacity = '0';
+            eyeOpen2.style.display = 'inline';
+            setTimeout(() => {
+                eyeOpen2.style.opacity = '1';
+            }, 50);
+        } else {
+            eyeOpen2.style.opacity = '0';
+            setTimeout(() => {
+                eyeOpen2.style.display = 'none';
+                eyeClosed2.style.opacity = '1';
+            }, 300);
+        }
+    });
+
+
+    document.getElementById('id_photo').addEventListener('change', function (event) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var preview = document.getElementById('photo-preview');
+            preview.src = e.target.result;
+            preview.style.display = 'block'; 
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    });
+
+
+
+    function toggleHomeroomClassSelect() {
+        const checkbox = document.getElementById('id_is_class_teacher');
+        const block = document.getElementById('homeroom_class_block');
+        block.style.display = checkbox.checked ? 'block' : 'none';
+    }
+
+    // Показати поле при завантаженні сторінки, якщо чекбокс уже обраний
+    window.addEventListener('DOMContentLoaded', function () {
+        toggleHomeroomClassSelect();
+    });
+
+    $(document).ready(function () {
+        $('.select2').select2({
+            placeholder: "Оберіть зі списку",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+
+</script>
+
+{% endblock %}

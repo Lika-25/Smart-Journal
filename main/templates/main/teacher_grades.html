@@ -1,0 +1,152 @@
+{% extends 'main/base.html' %}
+{% load custom_filters %}
+
+{% block title %}Журнал оцінок{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">📖 Журнал оцінок</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-center">
+                <div class="col-md-5">
+                    <label for="subject" class="form-label">Предмет:</label>
+                    <select name="subject" id="subject" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Оберіть предмет --</option>
+                        {% for subj in subjects %}
+                            <option value="{{ subj.id }}" {% if subj.id == selected_subject_id %}selected{% endif %}>
+                                {{ subj.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {% if selected_subject_id %}
+                <div class="col-md-5">
+                    <label for="class" class="form-label">Клас:</label>
+                    <select name="class" id="class" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Оберіть клас --</option>
+                        {% for cls in classes %}
+                            <option value="{{ cls.id }}" {% if cls.id == selected_class_id %}selected{% endif %}>
+                                {{ cls.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    {% if students %}
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="row mb-3 gy-2 align-items-center">
+                    <div class="col-12 col-md-8">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
+                            <label for="new_date" class="form-label mb-0">Додати дату:</label>
+                            <input type="date" name="new_date" id="new_date" class="form-control" style="max-width: 150px;">
+                            <button type="submit" name="add_date" class="btn btn-outline-primary">
+                                <i class="bi bi-calendar-plus"></i> + Додати
+                            </button>
+                        </div>
+                    </div>
+                
+                    <!-- Зберегти всі оцінки -->
+                    <div class="col-12 col-md-4 text-md-end">
+                        <button type="submit" name="save_grades" class="btn btn-success w-100 w-md-auto">
+                            💾 Зберегти всі оцінки
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th style="width: 40px;">№</th>
+                                <th style="min-width: 200px;">Учень</th>
+                                {% for date in dates %}
+                                    <th style="min-width: 100px;">
+                                        {{ date|date:"d.m.Y" }}
+                                        <button type="submit" name="delete_date" value="{{ date|date:'Y-m-d' }}" 
+                                                class="btn btn-sm btn-outline-danger float-end" title="Видалити дату">
+                                            ×
+                                        </button>
+                                    </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if student.photo %}
+                                            <img src="{{ student.photo.url }}" class="rounded-circle me-2" width="32" height="32" alt="">
+                                        {% endif %}
+                                        {{ student.full_name }}
+                                    </div>
+                                </td>
+                                {% for date in dates %}
+                                <td>
+                                    <input type="number" min="1" max="12" step="1"
+                                           name="grade_{{ student.id }}_{{ date|date:'Y-m-d' }}"
+                                           class="form-control text-center grade-input"
+                                           value="{{ grades_by_student|get_item:student.id|get_item:date|default_if_none:'' }}"
+                                           placeholder="-">
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Успішність учнів (середній бал) -->
+    <hr class="my-4">
+    <h4>📈 Успішність учнів (середній бал)</h4>
+    <div class="table-responsive">
+        <table class="table  table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 40px;">№</th>
+                    <th>Учень</th>
+                    <th>Середній бал</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student, avg in ranking %}
+                <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            {% if student.photo %}
+                                <img src="{{ student.photo.url }}" class="rounded-circle me-2" width="32" height="32" alt="">
+                            {% endif %}
+                            {{ student.full_name }}
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        {% if avg is not None %}
+                            {{ avg }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

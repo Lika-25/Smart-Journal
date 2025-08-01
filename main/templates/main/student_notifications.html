@@ -1,0 +1,42 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<h2 class="mb-4">📩 Повідомлення про оцінки</h2>
+
+<div class="table-responsive">
+  <table class="table table-bordered align-middle">
+    <thead class="table-light">
+      <tr>
+        <th scope="col">Дата дії</th>
+        <th scope="col">Предмет</th>
+        <th scope="col">Оцінка</th>
+        <th scope="col">Дата оцінки</th>
+        <th scope="col">Вчитель</th>
+        <th scope="col">Тип</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td>{{ log.updated_at|date:"d-m-Y H:i" }}</td>
+        <td>{{ log.subject.name }}</td>
+        <td>{{ log.grade }}</td>
+        <td>{{ log.date|date:"d-m-Y" }}</td>
+        <td>{{ log.teacher.full_name }}</td>
+        <td>
+          {% if log.action == "created" %}
+            Додано
+          {% else %}
+            Оновлено
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="text-center text-muted">Немає повідомлень.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

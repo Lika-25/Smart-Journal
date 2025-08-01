@@ -1,0 +1,116 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Мій клас{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Мій клас – {{ student.class_id.name }}</h2>
+
+<ul class="nav nav-tabs mb-3" id="classInnerTabs" role="tablist">
+  <li class="nav-item">
+    <button class="nav-link active" id="teacher-tab" data-bs-toggle="tab" data-bs-target="#teacher"
+      type="button">Класний керівник</button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" id="mates-tab" data-bs-toggle="tab" data-bs-target="#mates"
+      type="button">Однокласники</button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" id="rating-tab" data-bs-toggle="tab" data-bs-target="#rating"
+      type="button">Статистика</button>
+  </li>
+</ul>
+
+<div class="tab-content p-3 border rounded shadow-sm" id="classInnerTabsContent">
+  <!-- Класний керівник -->
+  <div class="tab-pane fade show active" id="teacher" role="tabpanel">
+    {% if teacher %}
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h4>{{ teacher.full_name }}</h4>
+        <br>
+        <p><strong>Email:</strong> {{ teacher.email }}</p>
+        <p><strong>Предмети, які викладає:</strong>
+          {% for subject in teacher_subjects %}
+          {{ subject.name }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </p>
+      </div>
+      <div class="col-md-4 text-center">
+        {% if teacher.photo %}
+        <img src="{{ teacher.photo.url }}" alt="Фото вчителя" class="img-thumbnail mb-2" style="max-width: 180px;">
+        <p class="text-muted">Класний керівник вашого класу</p>
+        {% else %}
+        <p>Фото відсутнє</p>
+        <p class="text-muted">Класний керівник вашого класу</p>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <p>Класного керівника не призначено.</p>
+    {% endif %}
+  </div>
+
+  <!-- Однокласники -->
+<div class="tab-pane fade" id="mates" role="tabpanel">
+  <h5>Список однокласників:</h5>
+  <ol class="list-group list-group-numbered">
+    {% for mate in classmates %}
+    <li class="list-group-item d-flex align-items-center">
+      {% if mate.photo %}
+      <img src="{{ mate.photo.url }}" alt="Аватар" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+      {% else %}
+      <div class="bg-secondary rounded-circle me-3" style="width: 40px; height: 40px;"></div>
+      {% endif %}
+      <div>
+        <strong>{{ mate.full_name }}</strong><br>
+        <small class="text-muted">{{ mate.email }}</small>
+      </div>
+    </li>
+    {% empty %}
+    <li class="list-group-item">Немає учнів у класі</li>
+    {% endfor %}
+  </ol>
+</div>
+
+  <!-- Статистика -->
+  <div class="tab-pane fade" id="rating" role="tabpanel">
+    <h5>Рейтинг учнів (за середнім балом):</h5>
+    <div class="table-responsive">
+      <table class="table  table-bordered">
+        <thead class="table-light">
+          <tr>
+            <th>№</th>
+            <th>ПІБ</th>
+            <th>Середній бал</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in ranked_students %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ s.full_name }}</td>
+            <td>
+              {% if s.average_score %}
+              {{ s.average_score|floatformat:2 }}
+              {% else %}
+              Немає оцінок
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3">Немає даних для відображення</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>    <!-- График -->
+    {% if stats_chart %}
+    <div class="text-center mt-4">
+      <img src="data:image/png;base64,{{ stats_chart }}" alt="Графік середніх балів" class="img-fluid" style="max-width: 100%;">
+    </div>
+  {% endif %}
+  </div>
+
+</div>
+{% endblock %}

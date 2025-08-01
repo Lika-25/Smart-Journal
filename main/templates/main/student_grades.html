@@ -1,0 +1,112 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Мої оцінки{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Мої оцінки</h2>
+
+<!-- Верхній рівень вкладок (предмети) -->
+<ul class="nav nav-tabs mb-3" id="subjectTabs" role="tablist">
+  {% for subject in subjects %}
+    <li class="nav-item" role="presentation">
+      <button class="nav-link {% if forloop.first %}active{% endif %}" id="tab-{{ subject.id }}" data-bs-toggle="tab" data-bs-target="#subject-{{ subject.id }}" type="button" role="tab">
+        {{ subject.name }}
+      </button>
+    </li>
+  {% endfor %}
+</ul>
+
+<div class="tab-content" id="subjectTabContent">
+  {% for subject in subjects %}
+    <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="subject-{{ subject.id }}" role="tabpanel">
+      
+      <!-- Внутрішні вкладки для кожного предмету -->
+      <ul class="nav nav-pills mb-3" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="marks-tab-{{ subject.id }}" data-bs-toggle="tab" data-bs-target="#marks-{{ subject.id }}" type="button" role="tab">Мої оцінки</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="stats-tab-{{ subject.id }}" data-bs-toggle="tab" data-bs-target="#stats-{{ subject.id }}" type="button" role="tab">Моя статистика</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="teacher-tab-{{ subject.id }}" data-bs-toggle="tab" data-bs-target="#teacher-info-{{ subject.id }}" type="button" role="tab">Преподаватель</button>
+        </li>
+      </ul>
+
+      <div class="tab-content border p-3 rounded shadow-sm">
+        <!-- Мої оцінки -->
+        <div class="tab-pane fade show active" id="marks-{{ subject.id }}" role="tabpanel">
+          {% if subject.marks %}
+            <ul class="list-group">
+              {% for mark in subject.marks %}
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>{{ mark.date|date:"j E Y" }}
+                </span>
+                  <strong>{{ mark.grade }}</strong>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>Оцінок з цього предмету ще немає.</p>
+          {% endif %}
+        </div>
+
+        <!-- Моя статистика -->
+        <div class="tab-pane fade" id="stats-{{ subject.id }}" role="tabpanel">
+          {% if subject.ranking %}
+            <div class="table-responsive mb-4">
+              <table class="table table-bordered ">
+                <thead class="table-light">
+                  <tr>
+                    <th>№</th>
+                    <th>ПІБ</th>
+                    <th>Середній бал</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for s in subject.ranking %}
+                    <tr {% if s.student__id == student.id %}class="table-info"{% endif %}>
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ s.student__full_name }}</td>
+                      <td>{{ s.average|floatformat:2 }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+        
+            {% if subject.chart %}
+              <h6>📈 Динаміка моїх оцінок:</h6>
+              <img src="data:image/png;base64,{{ subject.chart }}" class="img-fluid rounded border" alt="Графік оцінок">
+            {% endif %}
+          {% else %}
+            <p>Немає статистики по цьому предмету.</p>
+          {% endif %}
+        </div>
+        
+        
+        <div class="tab-pane fade" id="teacher-info-{{ subject.id }}" role="tabpanel">
+          {% if subject.teacher %}
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h5>{{ subject.teacher.full_name }}</h5>
+                <p><strong>Email:</strong> {{ subject.teacher.email }}</p>
+              </div>
+              <div class="col-md-4 text-center">
+                {% if subject.teacher.photo %}
+                  <img src="{{ subject.teacher.photo.url }}" alt="Фото вчителя" class="img-thumbnail mb-2" style="max-width: 180px;">
+                {% else %}
+                  <p>Фото відсутнє</p>
+                {% endif %}
+              </div>
+            </div>
+          {% else %}
+            <p>Інформація про викладача відсутня.</p>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+    Вхід або Реєстрація
+{% endblock %}
+
+{% block content %}
+    <div class="text-center mt-5">
+        <h1 class="display-4">Ласкаво просимо до SmartJournal!</h1>
+        <p class="lead mt-4">Що ви бажаєте зробити?</p>
+
+        <div class="mt-4">
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg m-2">Увійти 🔐</a>
+            <a href="{% url 'chose_role' %}" class="btn btn-success btn-lg m-2">Зареєструватися 📝</a>
+        </div>
+    </div>
+{% endblock %}

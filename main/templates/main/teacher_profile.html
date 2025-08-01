@@ -1,0 +1,63 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Профіль вчителя
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Вітаємо, {{ teacher.full_name }}! 👋</h2>
+
+<form method="post" enctype="multipart/form-data" action="{% url 'update_teacher_profile' %}">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label><strong>ПІБ:</strong></label>
+    <textarea name="full_name" class="form-control" id="fullNameInput" readonly rows="1" style="resize:none;">{{ teacher.full_name }}</textarea>
+  </div>
+
+  <div class="mb-3">
+    <label><strong>Email:</strong></label>
+    <textarea name="email" class="form-control" id="emailInput" readonly rows="1" style="resize:none;">{{ teacher.email }}</textarea>
+  </div>
+
+  <div class="mb-3">
+    {% if class_teacher_class %}
+      <label><strong>Ви класний керівник класу:</strong></label>
+      <textarea class="form-control" readonly rows="1" style="resize:none;">{{ class_teacher_class.name }}</textarea>
+    {% else %}
+      <label><strong>Ви не є класним керівником</strong></label>
+    {% endif %}
+  </div>
+
+  <div class="mb-3">
+    <label><strong>Предмети та класи, які ви викладаєте:</strong></label>
+    <ul>
+      {% for subject, classes_list in subjects_classes.items %}
+        <li><strong>{{ subject }}:</strong> {{ classes_list|join:", " }}</li>
+      {% empty %}
+        <li>Предмети не призначені</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="mb-3">
+    <label><strong>Ваше фото:</strong></label><br>
+    {% if teacher.photo %}
+      <img src="{{ teacher.photo.url }}" id="teacherPhotoPreview" class="img-thumbnail mb-2" style="max-width: 200px;">
+    {% endif %}
+    <input type="file" name="photo" class="form-control" id="photoInput" disabled>
+  </div>
+
+  <button type="button" class="btn btn-secondary" id="editBtn">Редагувати</button>
+  <button type="submit" class="btn btn-success d-none" id="saveBtn">Зберегти</button>
+</form>
+
+<script>
+  document.getElementById('editBtn').addEventListener('click', function () {
+    document.getElementById('fullNameInput').removeAttribute('readonly');
+    document.getElementById('emailInput').removeAttribute('readonly');
+    document.getElementById('photoInput').removeAttribute('disabled');
+    document.getElementById('saveBtn').classList.remove('d-none');
+    this.classList.add('d-none');
+  });
+</script>
+{% endblock %}

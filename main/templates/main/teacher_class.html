@@ -1,0 +1,79 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Мій клас{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">👩‍🏫 Мій клас {{ class_obj.name }} </h2>
+
+{% if not_class_teacher %}
+
+<div class="alert alert-warning">Ви не є класним керівником жодного класу.</div>
+{% else %}
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button"
+      role="tab">Учні</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button"
+      role="tab">Статистика</button>
+  </li>
+</ul>
+
+<div class="tab-content pt-3">
+  <!-- Вкладка "Учні" -->
+  <div class="tab-pane fade show active" id="students" role="tabpanel">
+    <h5>Клас: {{ class_obj.name }}</h5>
+    <ol class="list-group list-group-numbered">
+      {% for student in students %}
+      <li class="list-group-item d-flex align-items-center">
+        {% if student.photo.url %}
+        <img src="{{ student.photo.url }}" alt="avatar" class="rounded-circle me-3"
+          style="width:40px; height:40px; object-fit: cover;">
+        {% else %}
+        <div class="bg-secondary rounded-circle me-3" style="width:40px; height:40px;"></div>
+        {% endif %}
+        <div>
+          <strong>{{ student.full_name }}</strong><br>
+          <small class="text-muted">{{ student.email }}</small>
+        </div>
+      </li>
+      {% empty %}
+      <li class="list-group-item">У класі ще немає учнів.</li>
+      {% endfor %}
+    </ol>
+  </div>
+
+<!-- Вкладка "Статистика" -->
+<div class="tab-pane fade" id="stats" role="tabpanel">
+  <h5>📊 Середній бал учнів (від більшого до меншого)</h5>
+
+  <!-- Список учеников -->
+  <ol class="list-group list-group-numbered">
+    {% for entry in stats %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <span class="text-start flex-grow-1">{{ entry.student__full_name }}</span>
+      <strong class="text-end ms-3" style="min-width: 40px;">{{ entry.avg_grade|floatformat:2 }}</strong>
+    </li>
+    {% empty %}
+    <li class="list-group-item">Поки що немає оцінок для статистики.</li>
+    {% endfor %}
+  </ol>
+
+  <!-- График -->
+  {% if stats_chart %}
+  <div class="text-center mt-4">
+    <img src="data:image/png;base64,{{ stats_chart }}" alt="Графік середніх балів" class="img-fluid" style="max-width: 100%;">
+  </div>
+{% endif %}
+
+
+</div>
+
+
+
+</div>
+{% endif %}
+
+{% endblock %}
